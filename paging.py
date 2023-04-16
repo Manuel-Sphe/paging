@@ -14,7 +14,7 @@ from typing import List, Dict, Tuple
 def main()-> None:
 
     # the frame size from 1 to 7
-    size:int = int(sys.argv[1])
+    size : int = int(sys.argv[1])
 
 
     ref_size:List[int] = [j for j in range(8,65,8)]
@@ -31,38 +31,37 @@ def main()-> None:
 def FIFO(size:int,pages:List[int])->int:
 
     q : deque  = deque() # the queue is empty here
-    main_mem:List[str] = ['' for _ in range(size)] # '' acts as place-holder
-    
+    main_mem : List[str] = ['' for _ in range(size)] # '' acts as place-holder
+
     faults : int  = 0
 
     # Implementing the FIFO
     for index, page in enumerate(pages):
         for slot in range(len(main_mem)):
 
-            # while there's an empty frame keep on inserting until fool and cout the faults
+            # if there's an empty frame keep on inserting until fool and cout the faults
             if main_mem[slot] == '' and page  not in main_mem:
                 # Main_mem has some free slots
                 main_mem[slot] = page
                 q.append(page)
-                faults +=1
+                faults += 1
             # here handle the page fault when the main_mem is full
             elif (page not in main_mem and index>=size) and '' not in main_mem:
-                try:
-                    # pop left for deleting the first
                 
-                    main_mem[main_mem.index(q.popleft())] = page
-                except IndexError:
-                    # Queue is now empty can't delete"
-                    pass
+                # pop left for deleting the first
+                value_to_remove : str = q.popleft()
+                
+                # Replace the value data in the previous value's index position 
+                main_mem[main_mem.index(value_to_remove)] = page
+            
                 q.append(page)
-                faults +=1
+                faults += 1
                 break
-
     return faults
 
-def LRU(size:int,pages:list)->int:
+def LRU(size : int , pages : list)->int:
 
-    hash_table : Dict[int,int] = dict()#  {page:count}
+    hash_table : Dict[int , int] = dict()#  {page:count}
 
     main_mem : List[str] = ['' for _ in range(size)] # '' acts as place-holder
 
@@ -73,7 +72,7 @@ def LRU(size:int,pages:list)->int:
     for index, page in enumerate(pages):
         for slot in range(len(main_mem)):
 
-        
+
             # Main_mem has some free slots and insert when not found
             if main_mem[slot] == '' and page not in main_mem:
 
@@ -81,8 +80,7 @@ def LRU(size:int,pages:list)->int:
                 main_mem[slot] = page
                 hash_table[page] = count
                 faults += 1
-
-
+                
                 break
 
         # if there's hit but the main_mem is not full apdate the timer for that value
@@ -97,22 +95,22 @@ def LRU(size:int,pages:list)->int:
                 count +=1
                 hash_table[page] = count
                 if page not in main_mem:
-                    
+
                     # A hash table of those values in memory
                     in_mem_dict : Dict[int,int] = { i : hash_table[i] for i in main_mem }
-                    
+
                     # tuple with sorted value, sort by value-frequency(not by key) hence pair[1]
                     sorted_in_mem_tuple : Tuple[int,int] = sorted(in_mem_dict.items(),key = lambda pair : pair[1])
-                    
-                    # Sorted hash table 
+
+                    # Sorted hash table
                     sorted_in_mem_hash : Dict[int,int] = dict(sorted_in_mem_tuple)
-                    
+
                     # Get the key of the item with less frequency, since sort it will at index 0
                     value_to_replace : int = list(sorted_in_mem_hash.keys())[0]
-                    
+
                     # Get the index of that item memory replace the date with a new page
                     main_mem[main_mem.index(value_to_replace)] = page
-                    # update the faults 
+                    # update the faults
                     faults += 1
 
                 break
@@ -148,12 +146,10 @@ def OPT(size : int ,pages : List[int])->int:
                         # check if no the item is on the pages subset and pass(do nothing) if not
                         try:
                             # assume idx=0 is least used in future, then iterate through main memory change it, if it's less
-                            # to check if there's an iterm that's least used than that at zero 
+                            # to check if there's an iterm that's least used than that at zero
                             # Least used will have a a big mx value
                             if idx == 0:
-                                
-                                print(main_mem)
-                                print(arr)
+
                                 mx : int = arr.index(main_mem[idx])# assume this is max
 
                                 for i in range(1,len(main_mem)):
@@ -198,7 +194,7 @@ def OPT(size : int ,pages : List[int])->int:
 
                                 pass
                         except ValueError:
-                            # just do nothing
+                            # value not used in later 
                             pass
                 faults += 1
                 pass
